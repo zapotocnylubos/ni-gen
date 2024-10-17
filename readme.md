@@ -46,4 +46,14 @@ and a brief description of the progress will be included in the `README`.
 
 To build the compiler:
 
-TODO
+```shell
+make antlr antlr_runtime
+make lexer parser
+make compile
+```
+
+Try to parse a TinyC source file:
+
+```shell
+./bin/tc example/simple.c
+```

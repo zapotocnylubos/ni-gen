@@ -100,13 +100,7 @@ initializer
 // Compound statement rule.
 // Represents a block of statements enclosed in braces.
 compoundStatement
-    :   LBRACE statementList? RBRACE
-    ;
-
-// Statement list rule.
-// One or more statements.
-statementList
-    :   statement+
+    :   LBRACE (declaration | statement)* RBRACE
     ;
 
 // Statement rule.
@@ -114,12 +108,36 @@ statementList
 statement
     :   expressionStatement
     |   compoundStatement
+    |   selectionStatement
+    |   iterationStatement
+    |   jumpStatement
     ;
 
 // Expression statement rule.
 // An optional expression followed by a semicolon.
 expressionStatement
     :   expression? SEMICOLON
+    ;
+
+// **Control Flow Statements**
+// Includes selection statements (if-else) and iteration (while, for).
+
+// If-else statement rule.
+selectionStatement
+    :   IF LPAREN expression RPAREN statement (ELSE statement)?
+    ;
+
+// Iteration statement rule (while loop or for loop).
+iterationStatement
+    :   WHILE LPAREN expression RPAREN statement
+    |   FOR LPAREN expressionStatement expressionStatement expression? RPAREN statement
+    ;
+
+// **Jump Statements**
+// Handles return statements in functions.
+
+jumpStatement
+    :   RETURN expression? SEMICOLON
     ;
 
 // **Expressions**
@@ -209,10 +227,11 @@ unaryOperator
     ;
 
 // Postfix expression rule.
-// Handles function calls.
+// Handles function calls and array accesses.
 postfixExpression
     :   primaryExpression
-        ( LPAREN argumentExpressionList? RPAREN )*
+        ( LPAREN argumentExpressionList? RPAREN )*  // For function calls
+        ( LBRACKET expression RBRACKET )*           // For array accesses
     ;
 
 // Primary expression rule.

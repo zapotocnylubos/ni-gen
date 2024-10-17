@@ -8,11 +8,22 @@ INT         :   'int';
 CHAR        :   'char';
 FLOAT       :   'float';
 VOID        :   'void';
+IF          :   'if';
+ELSE        :   'else';
+FOR         :   'for';
+WHILE       :   'while';
+RETURN      :   'return';
+BREAK       :   'break';
+CONTINUE    :   'continue';
 
 // **Operators and Punctuation**
 // Tokens for operators and punctuation symbols used in the language.
 SEMICOLON   :   ';';
+COLON       :   ':';
 COMMA       :   ',';
+DOT         :   '.';
+QUESTION    :   '?';
+
 ASSIGN      :   '=';
 ADD_ASSIGN  :   '+=';
 SUB_ASSIGN  :   '-=';
@@ -39,11 +50,18 @@ OR_OP       :   '||';
 NOT_OP      :   '!';
 
 AMP         :   '&';
+BIT_OR      :   '|';
+BIT_XOR     :   '^';
+BIT_NOT     :   '~';
+LSHIFT      :   '<<';
+RSHIFT      :   '>>';
 
 LPAREN      :   '(';
 RPAREN      :   ')';
 LBRACE      :   '{';
 RBRACE      :   '}';
+LBRACKET    :   '[';
+RBRACKET    :   ']';
 
 // **Identifiers**
 // Matches variable and function names starting with a letter or underscore.
@@ -52,11 +70,17 @@ IDENTIFIER
     ;
 
 // **Constants**
-// Matches integer constants, floating-point constants, and character constants.
+// Matches integer constants, floating-point constants, character constants, and boolean literals.
 CONSTANT
     :   IntegerConstant
     |   FloatingConstant
     |   CharacterConstant
+    |   BOOLEAN_LITERAL
+    ;
+
+// **Boolean Literals**
+BOOLEAN_LITERAL
+    :   'true' | 'false'
     ;
 
 // **String Literals**

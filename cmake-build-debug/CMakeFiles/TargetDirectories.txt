@@ -1,0 +1,3 @@
+/tmp/ni-gen/cmake-build-debug/CMakeFiles/ni_gen.dir
+/tmp/ni-gen/cmake-build-debug/CMakeFiles/edit_cache.dir
+/tmp/ni-gen/cmake-build-debug/CMakeFiles/rebuild_cache.dir

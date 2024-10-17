@@ -1,0 +1,1 @@
+/usr/bin/c++ -g CMakeFiles/ni_gen.dir/src/main.cpp.o -o ni_gen 

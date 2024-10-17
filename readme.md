@@ -10,20 +10,20 @@ The project is developed as part of a term-long course on compiler construction,
 
 The project is structured into several components, reflecting the different stages of the compilation process:
 
-- **Syntax & Semantic Analysis**: 
-  - Parsing TinyC source code into an Abstract Syntax Tree (AST)
-  - Type checking and ensuring semantic correctness
+- **Syntax & Semantic Analysis**:
+    - Parsing TinyC source code into an Abstract Syntax Tree (AST)
+    - Type checking and ensuring semantic correctness
 
-- **LLVM IR Generation**: 
-  - Translating TinyC code to LLVM Intermediate Representation (IR)
-  - Includes data types, functions, and control flow constructs
+- **LLVM IR Generation**:
+    - Translating TinyC code to LLVM Intermediate Representation (IR)
+    - Includes data types, functions, and control flow constructs
 
-- **Optimization**: 
-  - Basic optimization passes to improve the performance of the generated IR
+- **Optimization**:
+    - Basic optimization passes to improve the performance of the generated IR
 
-- **Code Generation**: 
-  - Targeting Tiny86, a simplified CPU architecture
-  - Converting LLVM IR to Tiny86 assembly
+- **Code Generation**:
+    - Targeting Tiny86, a simplified CPU architecture
+    - Converting LLVM IR to Tiny86 assembly
 
 ## Development Phases
 

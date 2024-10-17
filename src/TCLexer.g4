@@ -12,6 +12,10 @@ IF          :   'if';
 ELSE        :   'else';
 FOR         :   'for';
 WHILE       :   'while';
+DO          :   'do';
+SWITCH      :   'switch';
+CASE        :   'case';
+DEFAULT     :   'default';
 RETURN      :   'return';
 BREAK       :   'break';
 CONTINUE    :   'continue';
@@ -37,6 +41,9 @@ STAR        :   '*';
 DIV         :   '/';
 MOD         :   '%';
 
+INCREMENT   :   '++';
+DECREMENT   :   '--';
+
 LT          :   '<';
 GT          :   '>';
 LE          :   '<=';
@@ -56,6 +63,7 @@ BIT_NOT     :   '~';
 LSHIFT      :   '<<';
 RSHIFT      :   '>>';
 
+// Parentheses and brackets
 LPAREN      :   '(';
 RPAREN      :   ')';
 LBRACE      :   '{';
@@ -149,7 +157,7 @@ LINE_COMMENT
     :   '//' ~[\r\n]* -> skip
     ;
 
-// Skips whitespace (spaces, tabs, newlines).
+// Skips whitespace (spaces, tabs, newlines, form feed).
 WS
-    :   [ \t\r\n]+ -> skip
+    :   [ \t\r\n\f]+ -> skip
     ;

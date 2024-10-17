@@ -6,6 +6,7 @@ options {
   tokenVocab=TCLexer; // // Import tokens from TCLexer.g4
 }
 
+
 // **Program Structure**
 // The starting rule for parsing a C program.
 // A program is a sequence of function definitions and declarations.
@@ -40,16 +41,25 @@ typeSpecifier
 // **Declarators and Pointers**
 // Handles variable and function declarators, possibly including pointers and parameters.
 
-// Declarator rule.
-// A declarator can include an optional pointer and an identifier, optionally followed by a parameter type list (for functions).
 declarator
-    :   pointer? IDENTIFIER parameterTypeList?
+    :   pointer? directDeclarator
+    ;
+
+directDeclarator
+    :   IDENTIFIER
+        ( LBRACKET constantExpression? RBRACKET )*   // For array declarations
+        ( parameterTypeList )?                       // For function declarators
     ;
 
 // Pointer rule.
 // This rule matches one or more '*' symbols, representing pointer types.
 pointer
     :   STAR pointer?
+    ;
+
+// **Constants**
+constantExpression
+    :   conditionalExpression
     ;
 
 // **Parameters and Arguments**
@@ -97,40 +107,45 @@ initializer
 // **Statements**
 // Defines different types of statements in the language.
 
-// Compound statement rule.
-// Represents a block of statements enclosed in braces.
 compoundStatement
     :   LBRACE (declaration | statement)* RBRACE
     ;
 
-// Statement rule.
-// Can be an expression statement or another compound statement.
 statement
-    :   expressionStatement
+    :   labeledStatement
+    |   expressionStatement
     |   compoundStatement
     |   selectionStatement
     |   iterationStatement
     |   jumpStatement
     ;
 
-// Expression statement rule.
+// **Labeled Statements**
+labeledStatement
+    :   CASE constantExpression COLON statement
+    |   DEFAULT COLON statement
+    ;
+
+// **Expression Statement**
 // An optional expression followed by a semicolon.
 expressionStatement
     :   expression? SEMICOLON
     ;
 
 // **Control Flow Statements**
-// Includes selection statements (if-else) and iteration (while, for).
+// Includes selection statements (if-else, switch-case) and iteration (while, for, do-while).
 
-// If-else statement rule.
+// Selection statement rule.
 selectionStatement
     :   IF LPAREN expression RPAREN statement (ELSE statement)?
+    |   SWITCH LPAREN expression RPAREN compoundStatement
     ;
 
-// Iteration statement rule (while loop or for loop).
+// Iteration statement rule.
 iterationStatement
     :   WHILE LPAREN expression RPAREN statement
     |   FOR LPAREN expressionStatement expressionStatement expression? RPAREN statement
+    |   DO statement WHILE LPAREN expression RPAREN SEMICOLON
     ;
 
 // **Jump Statements**
@@ -138,26 +153,22 @@ iterationStatement
 
 jumpStatement
     :   RETURN expression? SEMICOLON
+    |   BREAK SEMICOLON
+    |   CONTINUE SEMICOLON
     ;
 
 // **Expressions**
 // Handles the parsing of expressions, including assignments and arithmetic operations.
 
-// Expression rule.
-// An expression can be an assignment expression or a sequence of expressions separated by commas.
 expression
     :   assignmentExpression (COMMA assignmentExpression)*
     ;
 
-// Assignment expression rule.
-// An assignment or a conditional expression.
 assignmentExpression
     :   conditionalExpression
     |   unaryExpression assignmentOperator assignmentExpression
     ;
 
-// Assignment operator rule.
-// Matches assignment operators like '=', '*=', '/=', etc.
 assignmentOperator
     :   ASSIGN
     |   MUL_ASSIGN
@@ -167,74 +178,103 @@ assignmentOperator
     |   SUB_ASSIGN
     ;
 
-// Conditional expression rule.
-// For simplicity, we use logical OR expressions here.
+// **Conditional Expression**
+// Include the ternary conditional operator.
 conditionalExpression
     :   logicalOrExpression
+    |   logicalOrExpression QUESTION expression COLON conditionalExpression
     ;
 
-// Logical OR expression rule.
-// Represents logical OR operations.
+// **Logical OR Expression**
 logicalOrExpression
     :   logicalAndExpression (OR_OP logicalAndExpression)*
     ;
 
-// Logical AND expression rule.
-// Represents logical AND operations.
+// **Logical AND Expression**
 logicalAndExpression
-    :   equalityExpression (AND_OP equalityExpression)*
+    :   inclusiveOrExpression (AND_OP inclusiveOrExpression)*
     ;
 
-// Equality expression rule.
-// Handles '==' and '!=' comparisons.
+// **Bitwise Inclusive OR Expression**
+inclusiveOrExpression
+    :   exclusiveOrExpression (BIT_OR exclusiveOrExpression)*
+    ;
+
+// **Bitwise Exclusive OR Expression**
+exclusiveOrExpression
+    :   andExpression (BIT_XOR andExpression)*
+    ;
+
+// **Bitwise AND Expression**
+andExpression
+    :   equalityExpression (AMP equalityExpression)*
+    ;
+
+// **Equality Expression**
 equalityExpression
-    :   relationalExpression ( (EQ | NEQ) relationalExpression )*
+    :   relationalExpression ((EQ | NEQ) relationalExpression)*
     ;
 
-// Relational expression rule.
-// Handles relational operators like '<', '>', '<=', '>='.
+// **Relational Expression**
 relationalExpression
-    :   additiveExpression ( (LT | GT | LE | GE) additiveExpression )*
+    :   shiftExpression ((LT | GT | LE | GE) shiftExpression)*
     ;
 
-// Additive expression rule.
-// Handles addition and subtraction.
+// **Shift Expression**
+shiftExpression
+    :   additiveExpression ((LSHIFT | RSHIFT) additiveExpression)*
+    ;
+
+// **Additive Expression**
 additiveExpression
-    :   multiplicativeExpression ( (PLUS | MINUS) multiplicativeExpression )*
+    :   multiplicativeExpression ((PLUS | MINUS) multiplicativeExpression)*
     ;
 
-// Multiplicative expression rule.
-// Handles multiplication, division, and modulus.
+// **Multiplicative Expression**
 multiplicativeExpression
-    :   unaryExpression ( (STAR | DIV | MOD) unaryExpression )*
+    :   castExpression ((STAR | DIV | MOD) castExpression)*
     ;
 
-// Unary expression rule.
+// **Cast Expression**
+castExpression
+    :   unaryExpression
+    |   LPAREN typeSpecifier RPAREN castExpression   // For type casting
+    ;
+
+// **Unary Expression**
 // Handles unary operators and postfix expressions.
 unaryExpression
     :   postfixExpression
     |   unaryOperator unaryExpression
+    |   INCREMENT unaryExpression
+    |   DECREMENT unaryExpression
     ;
 
-// Unary operator rule.
-// Matches unary operators like '&', '*', '+', '-', '!'.
+// **Unary Operator**
+// Matches unary operators like '&', '*', '+', '-', '!', '~'.
 unaryOperator
     :   AMP
     |   STAR
     |   PLUS
     |   MINUS
     |   NOT_OP
+    |   BIT_NOT
     ;
 
-// Postfix expression rule.
-// Handles function calls and array accesses.
+// **Postfix Expression**
+// Handles function calls, array accesses, and postfix increment/decrement.
 postfixExpression
     :   primaryExpression
-        ( LPAREN argumentExpressionList? RPAREN )*  // For function calls
-        ( LBRACKET expression RBRACKET )*           // For array accesses
+        (   // Suffixes
+            ( LPAREN argumentExpressionList? RPAREN )     // Function calls
+            | ( LBRACKET expression RBRACKET )            // Array accesses
+            | ( DOT IDENTIFIER )                          // Struct member access (if structs are included)
+            | ( INCREMENT )                               // Postfix increment
+            | ( DECREMENT )                               // Postfix decrement
+        )*
     ;
 
-// Primary expression rule.
+// **Primary Expression**
 // Matches identifiers, constants, string literals, and parenthesized expressions.
 primaryExpression
     :   IDENTIFIER
@@ -243,7 +283,7 @@ primaryExpression
     |   LPAREN expression RPAREN
     ;
 
-// Argument expression list rule.
+// **Argument Expression List**
 // A comma-separated list of assignment expressions (function arguments).
 argumentExpressionList
     :   assignmentExpression (COMMA assignmentExpression)*

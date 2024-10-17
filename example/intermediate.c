@@ -12,5 +12,16 @@ int main() {
         x = x - 1;
     }
 
+    switch (x) {
+        case 1:
+            x = x + 10;
+            break;
+        case 2:
+            x = x + 20;
+            break;
+        default:
+            x = x + 30;
+    }
+
     return x;
 }

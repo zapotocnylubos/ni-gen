@@ -170,12 +170,12 @@ assignmentExpression
     ;
 
 assignmentOperator
-    :   ASSIGN
-    |   MUL_ASSIGN
-    |   DIV_ASSIGN
-    |   MOD_ASSIGN
-    |   ADD_ASSIGN
-    |   SUB_ASSIGN
+    :   ASSIGN     # assignmentOperatorAssign
+    |   MUL_ASSIGN # assignmentOperatorMulAssign
+    |   DIV_ASSIGN # assignmentOperatorDivAssign
+    |   MOD_ASSIGN # assignmentOperatorModAssign
+    |   ADD_ASSIGN # assignmentOperatorAddAssign
+    |   SUB_ASSIGN # assignmentOperatorSubAssign
     ;
 
 // **Conditional Expression**
@@ -277,10 +277,10 @@ postfixExpression
 // **Primary Expression**
 // Matches identifiers, constants, string literals, and parenthesized expressions.
 primaryExpression
-    :   IDENTIFIER
-    |   CONSTANT
-    |   STRING_LITERAL
-    |   LPAREN expression RPAREN
+    :   IDENTIFIER               # primaryExpressionIdentifier
+    |   CONSTANT                 # primaryExpressionConstant
+    |   STRING_LITERAL           # primaryExpressionStringLiteral
+    |   LPAREN expression RPAREN # primaryExpressionParenthesized
     ;
 
 // **Argument Expression List**

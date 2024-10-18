@@ -165,8 +165,8 @@ expression
     ;
 
 assignmentExpression
-    :   conditionalExpression
-    |   unaryExpression assignmentOperator assignmentExpression
+    :   conditionalExpression                                   # assignmentExpressionConditional
+    |   unaryExpression assignmentOperator assignmentExpression # assignmentExpressionAssignment
     ;
 
 assignmentOperator
@@ -181,8 +181,8 @@ assignmentOperator
 // **Conditional Expression**
 // Include the ternary conditional operator.
 conditionalExpression
-    :   logicalOrExpression
-    |   logicalOrExpression QUESTION expression COLON conditionalExpression
+    :   logicalOrExpression                                                 # conditionalExpressionLogicalOr
+    |   logicalOrExpression QUESTION expression COLON conditionalExpression # conditionalExpressionTernary
     ;
 
 // **Logical OR Expression**
@@ -237,28 +237,28 @@ multiplicativeExpression
 
 // **Cast Expression**
 castExpression
-    :   unaryExpression
-    |   LPAREN typeSpecifier RPAREN castExpression   // For type casting
+    :   unaryExpression                            # castExpressionUnary
+    |   LPAREN typeSpecifier RPAREN castExpression # castExpressionType
     ;
 
 // **Unary Expression**
 // Handles unary operators and postfix expressions.
 unaryExpression
-    :   postfixExpression
-    |   unaryOperator unaryExpression
-    |   INCREMENT unaryExpression
-    |   DECREMENT unaryExpression
+    :   postfixExpression             # unaryExpressionPostfix
+    |   unaryOperator unaryExpression # unaryExpressionUnaryOperator
+    |   INCREMENT unaryExpression     # unaryExpressionIncrement
+    |   DECREMENT unaryExpression     # unaryExpressionDecrement
     ;
 
 // **Unary Operator**
 // Matches unary operators like '&', '*', '+', '-', '!', '~'.
 unaryOperator
-    :   AMP
-    |   STAR
-    |   PLUS
-    |   MINUS
-    |   NOT_OP
-    |   BIT_NOT
+    :   AMP     # unaryOperatorAddressOf
+    |   STAR    # unaryOperatorDereference
+    |   PLUS    # unaryOperatorPlus
+    |   MINUS   # unaryOperatorMinus
+    |   NOT_OP  # unaryOperatorNot
+    |   BIT_NOT # unaryOperatorBitwiseNot
     ;
 
 // **Postfix Expression**

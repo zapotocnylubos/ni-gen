@@ -8,6 +8,9 @@
 #include "antlr4-runtime.h"
 #include "TCLexer.h"
 #include "TCParser.h"
+#include "AST.h"
+#include "ASTBuilder.h"
+
 
 using namespace antlr4;
 
@@ -42,7 +45,11 @@ int main(int argc, const char* argv[]) {
     tree::ParseTree* tree = parser.program();
 
     // Print the parse tree in LISP-style notation
-    std::cout << tree->toStringTree(&parser) << std::endl;
+    // std::cout << tree->toStringTree(&parser) << std::endl;
+
+    // Build the AST from the parse tree
+    ASTBuilder ast_builder;
+    ast_builder.visit(tree);
 
     return 0;
 }

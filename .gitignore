@@ -2,6 +2,7 @@ bin
 build
 lib
 gen
+cmake-build-debug
 
 .idea
 .DS_Store

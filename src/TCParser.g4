@@ -32,10 +32,12 @@ declaration
 // **Type Specifiers**
 // This rule matches basic types like 'int', 'char', 'float', and 'void'.
 typeSpecifier
-    :   INT
-    |   CHAR
-    |   FLOAT
-    |   VOID
+    :   INT    # typeSpecifierInt
+    |   CHAR   # typeSpecifierChar
+    |   FLOAT  # typeSpecifierFloat
+    |   DOUBLE # typeSpecifierDouble
+    |   VOID   # typeSpecifierVoid
+    |   BOOL   # typeSpecifierBool
     ;
 
 // **Declarators and Pointers**
@@ -47,8 +49,8 @@ declarator
 
 directDeclarator
     :   IDENTIFIER
-        ( LBRACKET constantExpression? RBRACKET )*   // For array declarations
-        ( parameterTypeList )?                       // For function declarators
+        ( LBRACKET constantExpression? RBRACKET )*
+        ( parameterTypeList )?
     ;
 
 // Pointer rule.
@@ -122,8 +124,8 @@ statement
 
 // **Labeled Statements**
 labeledStatement
-    :   CASE constantExpression COLON statement
-    |   DEFAULT COLON statement
+    :   CASE constantExpression COLON statement # caseStatement
+    |   DEFAULT COLON statement                 # defaultStatement
     ;
 
 // **Expression Statement**
@@ -137,24 +139,24 @@ expressionStatement
 
 // Selection statement rule.
 selectionStatement
-    :   IF LPAREN expression RPAREN statement (ELSE statement)?
-    |   SWITCH LPAREN expression RPAREN compoundStatement
+    :   IF LPAREN expression RPAREN statement (ELSE statement)? # ifStatement
+    |   SWITCH LPAREN expression RPAREN compoundStatement       # switchStatement
     ;
 
 // Iteration statement rule.
 iterationStatement
-    :   WHILE LPAREN expression RPAREN statement
-    |   FOR LPAREN expressionStatement expressionStatement expression? RPAREN statement
-    |   DO statement WHILE LPAREN expression RPAREN SEMICOLON
+    :   WHILE LPAREN expression RPAREN statement                                        # whileStatement
+    |   FOR LPAREN expressionStatement expressionStatement expression? RPAREN statement # forStatement
+    |   DO statement WHILE LPAREN expression RPAREN SEMICOLON                           # doWhileStatement
     ;
 
 // **Jump Statements**
 // Handles return statements in functions.
 
 jumpStatement
-    :   RETURN expression? SEMICOLON
-    |   BREAK SEMICOLON
-    |   CONTINUE SEMICOLON
+    :   RETURN expression? SEMICOLON # returnStatement
+    |   BREAK SEMICOLON              # breakStatement
+    |   CONTINUE SEMICOLON           # continueStatement
     ;
 
 // **Expressions**
@@ -164,6 +166,7 @@ expression
     :   assignmentExpression (COMMA assignmentExpression)*
     ;
 
+// TODO: problem here?
 assignmentExpression
     :   conditionalExpression                                   # assignmentExpressionConditional
     |   unaryExpression assignmentOperator assignmentExpression # assignmentExpressionAssignment
@@ -181,110 +184,129 @@ assignmentOperator
 // **Conditional Expression**
 // Include the ternary conditional operator.
 conditionalExpression
-    :   logicalOrExpression                                                 # conditionalExpressionLogicalOr
-    |   logicalOrExpression QUESTION expression COLON conditionalExpression # conditionalExpressionTernary
+    : logicalOrExpression                                                                       # conditionalExpressionEmpty
+    | conditionalExpression logicalOrExpression QUESTION expression COLON conditionalExpression # conditionalExpressionTernary
     ;
 
 // **Logical OR Expression**
 logicalOrExpression
-    :   logicalAndExpression (OR_OP logicalAndExpression)*
+    : logicalAndExpression                           # logicalOrExpressionEmpty
+    | logicalOrExpression OR_OP logicalAndExpression # logicalOrExpressionOR
     ;
 
 // **Logical AND Expression**
 logicalAndExpression
-    :   inclusiveOrExpression (AND_OP inclusiveOrExpression)*
+    : inclusiveOrExpression                             # logicalAndExpressionEmpty
+    | logicalAndExpression AND_OP inclusiveOrExpression # logicalAndExpressionAND
     ;
 
 // **Bitwise Inclusive OR Expression**
 inclusiveOrExpression
-    :   exclusiveOrExpression (BIT_OR exclusiveOrExpression)*
+    : exclusiveOrExpression                              # inclusiveOrExpressionEmpty
+    | inclusiveOrExpression BIT_OR exclusiveOrExpression # inclusiveOrExpressionOR
     ;
 
 // **Bitwise Exclusive OR Expression**
 exclusiveOrExpression
-    :   andExpression (BIT_XOR andExpression)*
+    : andExpression                               # exclusiveOrEmpty
+    | exclusiveOrExpression BIT_XOR andExpression # exclusiveOrExpressionXOR
     ;
 
 // **Bitwise AND Expression**
 andExpression
-    :   equalityExpression (AMP equalityExpression)*
+    : equalityExpression                   # andExpressionEmpty
+    | andExpression AMP equalityExpression # andExpressionAMP
     ;
 
 // **Equality Expression**
 equalityExpression
-    :   relationalExpression ((EQ | NEQ) relationalExpression)*
+    : relationalExpression                        # equalityExpressionEmpty
+    | equalityExpression EQ relationalExpression  # equalityExpressionEQ
+    | equalityExpression NEQ relationalExpression # equalityExpressionNEQ
     ;
 
 // **Relational Expression**
 relationalExpression
-    :   shiftExpression ((LT | GT | LE | GE) shiftExpression)*
+    : shiftExpression                         # relationalExpressionEmpty
+    | relationalExpression LT shiftExpression # relationalExpressionLT
+    | relationalExpression GT shiftExpression # relationalExpressionGT
+    | relationalExpression LE shiftExpression # relationalExpressionLE
+    | relationalExpression GE shiftExpression # relationalExpressionGE
     ;
 
 // **Shift Expression**
 shiftExpression
-    :   additiveExpression ((LSHIFT | RSHIFT) additiveExpression)*
+    : additiveExpression                        # shiftExpressionEmpty
+    | shiftExpression LSHIFT additiveExpression # shiftExpressionLeft
+    | shiftExpression RSHIFT additiveExpression # shiftExpressionRight
     ;
 
 // **Additive Expression**
 additiveExpression
-    :   multiplicativeExpression ((PLUS | MINUS) multiplicativeExpression)*
+    : multiplicativeExpression                          # additiveExpressionEmpty
+    | additiveExpression PLUS multiplicativeExpression  # additiveExpressionPlus
+    | additiveExpression MINUS multiplicativeExpression # additiveExpressionMinus
     ;
 
 // **Multiplicative Expression**
 multiplicativeExpression
-    :   castExpression ((STAR | DIV | MOD) castExpression)*
+    : castExpression                               # multiplicativeExpressionEmpty
+    | multiplicativeExpression STAR castExpression # multiplicativeExpressionStar
+    | multiplicativeExpression DIV castExpression  # multiplicativeExpressionDiv
+    | multiplicativeExpression MOD castExpression  # multiplicativeExpressionMod
     ;
 
 // **Cast Expression**
 castExpression
-    :   unaryExpression                            # castExpressionUnary
-    |   LPAREN typeSpecifier RPAREN castExpression # castExpressionType
+    : unaryExpression                            # castExpressionEmpty
+    | LPAREN typeSpecifier RPAREN castExpression # castExpressionCast
     ;
 
 // **Unary Expression**
 // Handles unary operators and postfix expressions.
 unaryExpression
-    :   postfixExpression             # unaryExpressionPostfix
-    |   unaryOperator unaryExpression # unaryExpressionUnaryOperator
-    |   INCREMENT unaryExpression     # unaryExpressionIncrement
-    |   DECREMENT unaryExpression     # unaryExpressionDecrement
+    : postfixExpression             # unaryExpressionPostfix
+    | unaryOperator unaryExpression # unaryExpressionUnaryOperator
+    | INCREMENT unaryExpression     # unaryExpressionIncrement
+    | DECREMENT unaryExpression     # unaryExpressionDecrement
     ;
 
 // **Unary Operator**
 // Matches unary operators like '&', '*', '+', '-', '!', '~'.
 unaryOperator
-    :   AMP     # unaryOperatorAddressOf
-    |   STAR    # unaryOperatorDereference
-    |   PLUS    # unaryOperatorPlus
-    |   MINUS   # unaryOperatorMinus
-    |   NOT_OP  # unaryOperatorNot
-    |   BIT_NOT # unaryOperatorBitwiseNot
+    : AMP     # unaryOperatorAddressOf
+    | STAR    # unaryOperatorDereference
+    | PLUS    # unaryOperatorPlus
+    | MINUS   # unaryOperatorMinus
+    | NOT_OP  # unaryOperatorNot
+    | BIT_NOT # unaryOperatorBitwiseNot
     ;
 
 // **Postfix Expression**
 // Handles function calls, array accesses, and postfix increment/decrement.
 postfixExpression
-    :   primaryExpression
-        (   // Suffixes
-            ( LPAREN argumentExpressionList? RPAREN )     // Function calls
-            | ( LBRACKET expression RBRACKET )            // Array accesses
-            | ( DOT IDENTIFIER )                          // Struct member access (if structs are included)
-            | ( INCREMENT )                               // Postfix increment
-            | ( DECREMENT )                               // Postfix decrement
-        )*
+    : primaryExpression postfixSuffix*
+    ;
+
+postfixSuffix
+    : LPAREN argumentExpressionList? RPAREN # postfixSuffixFunctionCall
+    | LBRACKET expression RBRACKET          # postfixSuffixArrayAccess
+    | DOT IDENTIFIER                        # postfixSuffixStructMember
+    | INCREMENT                             # postfixSuffixIncrement
+    | DECREMENT                             # postfixSuffixDecrement
     ;
 
 // **Primary Expression**
 // Matches identifiers, constants, string literals, and parenthesized expressions.
 primaryExpression
-    :   IDENTIFIER               # primaryExpressionIdentifier
-    |   CONSTANT                 # primaryExpressionConstant
-    |   STRING_LITERAL           # primaryExpressionStringLiteral
-    |   LPAREN expression RPAREN # primaryExpressionParenthesized
+    : IDENTIFIER               # primaryExpressionIdentifier
+    | CONSTANT                 # primaryExpressionConstant
+    | STRING_LITERAL           # primaryExpressionStringLiteral
+    | LPAREN expression RPAREN # primaryExpressionParenthesized
     ;
 
 // **Argument Expression List**
 // A comma-separated list of assignment expressions (function arguments).
 argumentExpressionList
-    :   assignmentExpression (COMMA assignmentExpression)*
+    : assignmentExpression (COMMA assignmentExpression)*
     ;

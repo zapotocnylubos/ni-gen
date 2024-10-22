@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <any>
 
 // AST Node Definitions
 
@@ -196,6 +197,36 @@ public:
     Type type;
     std::string value; // For identifier, constant, string literal
     std::unique_ptr<ASTNode> expression; // For parenthesized expression
+};
+
+class Identifier: public ASTNode {
+public:
+    std::string name;
+};
+
+class IntegerConstant : public ASTNode {
+public:
+    int value;
+};
+
+class FloatingConstant : public ASTNode {
+public:
+    double value;
+};
+
+class CharacterConstant : public ASTNode {
+public:
+    char value;
+};
+
+class StringLiteral : public ASTNode {
+public:
+    std::string value;
+};
+
+class BooleanLiteral : public ASTNode {
+public:
+    bool value;
 };
 
 // ArgumentExpressionList node

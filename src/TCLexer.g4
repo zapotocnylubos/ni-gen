@@ -7,7 +7,10 @@ lexer grammar TCLexer;
 INT         :   'int';
 CHAR        :   'char';
 FLOAT       :   'float';
+DOUBLE      :   'double';
 VOID        :   'void';
+BOOL        :   'bool';
+
 IF          :   'if';
 ELSE        :   'else';
 FOR         :   'for';

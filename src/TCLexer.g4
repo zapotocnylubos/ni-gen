@@ -25,46 +25,50 @@ CONTINUE    :   'continue';
 
 // **Operators and Punctuation**
 // Tokens for operators and punctuation symbols used in the language.
-SEMICOLON   :   ';';
-COLON       :   ':';
-COMMA       :   ',';
-DOT         :   '.';
-QUESTION    :   '?';
 
-ASSIGN      :   '=';
+// Define longer tokens before shorter ones to prevent matching issues.
+INCREMENT   :   '++';
+DECREMENT   :   '--';
+
 ADD_ASSIGN  :   '+=';
 SUB_ASSIGN  :   '-=';
 MUL_ASSIGN  :   '*=';
 DIV_ASSIGN  :   '/=';
 MOD_ASSIGN  :   '%=';
 
+EQ          :   '==';
+NEQ         :   '!=';
+LE          :   '<=';
+GE          :   '>=';
+
+LSHIFT      :   '<<';
+RSHIFT      :   '>>';
+
+AND_OP      :   '&&';
+OR_OP       :   '||';
+
+ASSIGN      :   '=';
 PLUS        :   '+';
 MINUS       :   '-';
 STAR        :   '*';
 DIV         :   '/';
 MOD         :   '%';
 
-INCREMENT   :   '++';
-DECREMENT   :   '--';
-
 LT          :   '<';
 GT          :   '>';
-LE          :   '<=';
-GE          :   '>=';
-
-EQ          :   '==';
-NEQ         :   '!=';
-
-AND_OP      :   '&&';
-OR_OP       :   '||';
-NOT_OP      :   '!';
 
 AMP         :   '&';
 BIT_OR      :   '|';
 BIT_XOR     :   '^';
+
+NOT_OP      :   '!';
 BIT_NOT     :   '~';
-LSHIFT      :   '<<';
-RSHIFT      :   '>>';
+
+SEMICOLON   :   ';';
+COLON       :   ':';
+COMMA       :   ',';
+DOT         :   '.';
+QUESTION    :   '?';
 
 // Parentheses and brackets
 LPAREN      :   '(';
@@ -74,10 +78,10 @@ RBRACE      :   '}';
 LBRACKET    :   '[';
 RBRACKET    :   ']';
 
-// **Identifiers**
-// Matches variable and function names starting with a letter or underscore.
-IDENTIFIER
-    :   [a-zA-Z_] [a-zA-Z0-9_]*
+// **Literals**
+// Matches string literals enclosed in double quotes.
+STRING_LITERAL
+    :   '"' ( EscapeSequence | [^"\\\r\n] )* '"'
     ;
 
 // **Constants**
@@ -85,23 +89,17 @@ IDENTIFIER
 CONSTANT
     :   IntegerConstant
     |   FloatingConstant
+    |   BooleanConstant
     |   CharacterConstant
-    |   BOOLEAN_LITERAL
-    ;
-
-// **Boolean Literals**
-BOOLEAN_LITERAL
-    :   'true' | 'false'
-    ;
-
-// **String Literals**
-// Matches string literals enclosed in double quotes.
-STRING_LITERAL
-    :   '"' (EscapeSequence | ~["\\])* '"'
     ;
 
 // **Fragments**
 // Helper rules used within other lexer rules (not tokens themselves).
+
+fragment BooleanConstant
+    :  'true'
+    |  'false'
+    ;
 
 // Matches decimal integer constants.
 fragment IntegerConstant
@@ -131,9 +129,10 @@ fragment FloatSuffix
     :   [fF]
     ;
 
+// **Character Constants**
 // Matches character constants (e.g., 'a', '\n').
 fragment CharacterConstant
-    :   '\'' (EscapeSequence | ~['\\]) '\''
+    :   '\'' ( EscapeSequence | [^'\\\r\n] ) '\''
     ;
 
 // Matches escape sequences in strings and character constants.
@@ -144,7 +143,15 @@ fragment EscapeSequence
 
 // Corrected OctalEscape fragment.
 fragment OctalEscape
-    :   [0-7] [0-7]? [0-7]?     // Matches one to three octal digits.
+    :   [0-7]
+        [0-7]?
+        [0-7]?
+    ;
+
+// **Identifiers**
+// Matches variable and function names starting with a letter or underscore.
+IDENTIFIER
+    :   [a-zA-Z_] [a-zA-Z0-9_]*
     ;
 
 // **Comments and Whitespace**

@@ -38,14 +38,21 @@ int main(int argc, const char* argv[]) {
     // Create a token stream from the lexer
     CommonTokenStream tokens(&lexer);
 
+    // print all tokens
+//     tokens.fill();
+//     for (auto token : tokens.getTokens()) {
+//         std::cout << token->toString() << std::endl;
+//     }
+//     return 0;
+
     // Create a parser instance
     TCParser parser(&tokens);
 
     // Parse the input starting from the 'program' rule
     tree::ParseTree* tree = parser.program();
 
-    // Print the parse tree in LISP-style notation
-    // std::cout << tree->toStringTree(&parser) << std::endl;
+//     Print the parse tree in LISP-style notation
+     std::cout << tree->toStringTree(&parser) << std::endl;
 
     // Build the AST from the parse tree
     ASTBuilder ast_builder;
